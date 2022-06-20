@@ -22,6 +22,7 @@ public class FormCustomer extends JFrame {
     JTextField txtCustNum, txtCustName, txtCustAddr, txtCustPhone, txtCustMail;
     JTextField txtSearchCust;
     JTable tbCust;
+    JButton cmdSaveCust, cmdUpdateCust, cmdDeleteCust, cmdClear;
     DefaultTableModel tbModel;
 
     public FormCustomer() {
@@ -78,15 +79,18 @@ public class FormCustomer extends JFrame {
         pWest.add(pForm, BorderLayout.CENTER);
 
         JPanel pCenter = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton cmdSaveCust = new JButton("เพิ่มข้อมูล");
+        cmdSaveCust = new JButton("เพิ่มข้อมูล");
         cmdSaveCust.addActionListener(e -> insert());
         pCenter.add(cmdSaveCust);
-        JButton cmdUpdateCust = new JButton("แก้ไข");
+        cmdUpdateCust = new JButton("แก้ไข");
         cmdUpdateCust.addActionListener(e -> update());
         pCenter.add(cmdUpdateCust);
-        JButton cmdDeleteCust = new JButton("ลบ");
+        cmdDeleteCust = new JButton("ลบ");
         cmdDeleteCust.addActionListener(e -> delete());
-        pCenter.add(cmdDeleteCust, BorderLayout.CENTER);
+        pCenter.add(cmdDeleteCust);
+        cmdClear = new JButton("ยกเลิก");
+        cmdClear.addActionListener(e -> clear());
+        pCenter.add(cmdClear);
 
         JPanel pTable = new JPanel();
         tbCust = new JTable();
@@ -109,6 +113,7 @@ public class FormCustomer extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int index = tbCust.getSelectedRow();
+                cmdSaveCust.setEnabled(false);
                 txtCustNum.setEditable(false);
                 txtCustNum.setText(tbCust.getValueAt(index, 0).toString());
                 txtCustName.setText(tbCust.getValueAt(index, 1).toString());
@@ -165,6 +170,12 @@ public class FormCustomer extends JFrame {
 
     public void insert() {
         try {
+            if ((txtCustNum.getText().trim() == "") || (txtCustNum.getText().trim().length() != 4)) {
+                JOptionPane.showMessageDialog(this, "กรุณากรอกเลขที่ลูกค้า 4 หลัก",
+                        "ผลการบันทึกรายการ", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             String sql = "INSERT INTO CUSTOMER VALUES (?,?,?,?,?)";
             PreparedStatement pre = con.prepareStatement(sql);
             pre.setString(1, txtCustNum.getText().trim());
@@ -232,5 +243,16 @@ public class FormCustomer extends JFrame {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void clear() {
+        cmdSaveCust.setEnabled(true);
+        txtCustNum.setEditable(true);
+        showData();
+        txtCustNum.setText("");
+        txtCustName.setText("");
+        txtCustAddr.setText("");
+        txtCustPhone.setText("");
+        txtCustMail.setText("");
     }
 }
